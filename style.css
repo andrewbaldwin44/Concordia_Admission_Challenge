@@ -27,15 +27,15 @@ html {
   position: absolute;
   left: 100px;
   top: 20vh;
-  width: 300px;
-  height: 450px;
+  width: 16vw;
+  height: 50vh;
   border: 4px solid rgba(230, 247, 36);
   border-radius: 3px;
   transition: width 0.2s linear, height 0.2s linear;
 }
 #poster:hover {
-  width: 305px;
-  height: 455px;
+  width: 16.5vw;
+  height: 50.5vh;
 }
 
 /*Headers*/
@@ -185,8 +185,12 @@ a:hover {
 /*Grid changed to one character per row*/
 @media (max-width: 1000px) {
   #poster {
+    width: 30vw;
     left: 50%;
     transform: translate(-50%);
+  }
+  #poster:hover {
+    width: 30.5vw;
   }
 
   h1 {
@@ -225,8 +229,15 @@ a:hover {
     height: 30vh;
   }
 
+  #poster {
+    width: 50vw;
+  }
+  #poster:hover {
+    width: 50.5vw;
+  }
+
   h1 {
-    font-size: 70px;
+    font-size: 85px;
   }
   #characters {
     grid-template-rows: 110px 0.2fr 0.4fr 0.2fr 0.2fr;
