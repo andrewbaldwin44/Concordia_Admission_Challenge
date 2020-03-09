@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
 
+:root {
+  --blueHighlight: rgb(81, 54, 255);
+}
+
 html {
+  position: absolute;
   font-size: 24px;
   font-family: 'Raleway', sans-serif;
   line-height: 30px;
@@ -14,13 +19,14 @@ html {
   position: absolute;
   left: 0px;
   top: 0px;
+  margin-left: 0px;
   width: 100vw;
   height: 50vh;
 }
 #poster {
   position: absolute;
   left: 100px;
-  top: 22vh;
+  top: 20vh;
   width: 300px;
   height: 450px;
   border: 4px solid rgba(230, 247, 36);
@@ -44,7 +50,7 @@ a {
   margin-top: 0px;
   font-weight: bold;
   font-size: 1.2rem;
-  transition: text-shadow 0.2s linear, font-size 0.2s linear;
+  transition-duration: 0.2s;
 }
 a:hover {
   text-shadow: 1px 1px 5px rgba(70, 149, 241, 0.8);
@@ -89,6 +95,14 @@ a:hover {
   margin-top: 20px;
   padding: 0 10px;
 }
+#userInput, #commentInput {
+  padding: 5px 10px;
+  border: 1px solid black;
+  border-radius: 2px;
+}
+#userInput:focus, #commentInput:focus {
+  outline-color: var(--blueHighlight);
+}
 #userInput {
   font-size: 24px;
   margin-bottom: 20px;
@@ -99,12 +113,25 @@ a:hover {
 }
 #submitButton {
   grid-area: 3/1/3/3;
+  font-size: 1rem;
   width: 400px;
   height: 50px;
   align-self: center;
   justify-self: center;
   margin-top: 20px;
   margin-bottom: 20px;
+  background-color: var(--blueHighlight);
+  border: 2px solid black;
+  border-radius: 5px;
+}
+#submitButton:hover {
+  cursor: pointer;
+}
+#submitButton:focus {
+  outline: none;
+}
+.disabled {
+  opacity: 0.4;
 }
 
 .commentSeperator {
@@ -183,9 +210,7 @@ a:hover {
     flex-direction: column;
   }
   #userInput, #commentInput {
-    margin-left: 5px;
-    margin-top: 10px;
-    margin-bottom: 20px;
+    margin: 10px 0 20px 5px;
   }
   #submitButton {
     margin-top: 10px;
@@ -199,11 +224,18 @@ a:hover {
   #banner {
     height: 30vh;
   }
+
   h1 {
     font-size: 70px;
-    margin: 48vh 50px 0 0;
   }
   #characters {
     grid-template-rows: 110px 0.2fr 0.4fr 0.2fr 0.2fr;
+  }
+
+  #userInput, #commentInput {
+    font-size: 50px;
+  }
+  #submitButton {
+    font-size: 30px;
   }
 }

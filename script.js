@@ -2,12 +2,18 @@
 Paste them to the Comment Storage Array*/
 let commentStorage = [];
 window.onload = function() {
-  let existingComments = JSON.parse(localStorage.commentsArray);
+  /*Clear Comment Input Values*/
+  userInput.value = "";
+  commentInput.value = "";
 
-  for (item in existingComments) {
-    let updateStorage = [existingComments[item][0], existingComments[item][1]]
-    commentStorage.push(updateStorage);
-    createComment(existingComments[item][0], existingComments[item][1])
+  /*Load pre-existing comments if there are any*/
+  if (localStorage.commentsArray) {
+    let existingComments = JSON.parse(localStorage.commentsArray);
+    for (item in existingComments) {
+      let updateStorage = [existingComments[item][0], existingComments[item][1]]
+      commentStorage.push(updateStorage);
+      createComment(existingComments[item][0], existingComments[item][1])
+    }
   }
 }
 
@@ -27,8 +33,6 @@ function createComment(userName, comment) {
   let today = new Date();
 
   const body = document.querySelector("body");
-  const userInput = document.querySelector("#userInput");
-  const commentInput = document.querySelector("#commentInput");
 
   const commentSeperator = document.createElement("hr");
   commentSeperator.setAttribute("class", "commentSeperator");
@@ -71,6 +75,13 @@ function createComment(userName, comment) {
   body.appendChild(commentSection);
 }
 
+/*Enable / Disable submit button*/
+const userInput = document.querySelector("#userInput");
+const commentInput = document.querySelector("#commentInput");
+
+userInput.addEventListener("input", buttonEnableDisable);
+commentInput.addEventListener("input", buttonEnableDisable);
+
 /*Action for comment submit button*/
 const submitButton = document.querySelector("#submitButton");
 
@@ -78,8 +89,27 @@ submitButton.addEventListener("click", () => {
   userName = document.querySelector("#userInput").value;
   comment = document.querySelector("#commentInput").value;
 
-  createComment(userName, comment);
+  if (userName && comment) {
+    submitButton.classList.remove("disabled");
+    createComment(userName, comment);
 
-  /*Save comment to Local Storage*/
-  saveComment(userInput.value, commentInput.value);
+    /*Scroll Window to Added Comment*/
+    window.scrollTo(0, document.body.scrollHeight);
+
+    /*Save comment to Local Storage*/
+    saveComment(userInput.value, commentInput.value);
+
+    /*Clear Inputs*/
+    userInput.value = "";
+    commentInput.value = "";
+  }
 });
+
+function buttonEnableDisable() {
+  if (userInput.value && commentInput.value) {
+    submitButton.classList.remove("disabled");
+  }
+  else {
+    submitButton.classList.add("disabled");
+  }
+}
