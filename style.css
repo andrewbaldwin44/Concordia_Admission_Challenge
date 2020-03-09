@@ -6,7 +6,10 @@ html {
   line-height: 30px;
   text-align: justify;
   background-color: rgba(231, 231, 231, 0.5);
+  overflow-x: hidden;
 }
+
+/*Header Images section*/
 #banner {
   position: absolute;
   left: 0px;
@@ -22,62 +25,155 @@ html {
   height: 450px;
   border: 4px solid rgba(230, 247, 36);
   border-radius: 3px;
-  transition: border-width 0.3s linear;
+  transition: width 0.2s linear, height 0.2s linear;
 }
 #poster:hover {
-  border: 7px solid yellow;
+  width: 305px;
+  height: 455px;
 }
 
+/*Headers*/
 h1 {
   margin: 53vh 0 180px 420px;
   font-weight: bold;
   font-size: 52px;
 }
+a {
+  text-decoration: none;
+  color: rgb(0, 0, 0);
+  margin-top: 0px;
+  font-weight: bold;
+  transition: text-shadow 0.2s linear, font-size 0.2s linear;
+}
+a:hover {
+  text-shadow: 1px 1px 5px rgba(70, 149, 241, 0.8);
+  font-size: 24.2px;
+}
 
+/*Body paragraphs*/
 #synopsis, #characters {
   width: 90%;
   margin-left: 95px;
   margin-top: 10%;
 }
 
+/*Characters Grid Container*/
 #characterHeader {grid-area: 1/1/1/5;}
 #characters {
   display: grid;
-  grid-template-columns: repeat(2, 0.1fr 0.4fr);
-  grid-template-rows: 70px 1fr 1fr 1fr;
-  grid-gap: 30px 50px;
-  height: 100vh;
+  grid-template-columns: repeat(2, 0.2fr 0.3fr);
+  grid-template-rows: 70px 1fr 1fr;
+  grid-gap: 50px 50px;
   margin-top: 5%;
   margin-bottom: 2%;
 }
-h3 {
-  margin-top: 0px;
-}
-.textContent {
-  height: 100%;
-}
-
 .characterPortrait {
   width: 100%;
   height: 20vw;
 }
 
+#mainSeperator {
+  color: rgb(231, 228, 229);
+  width: 98vw;
+}
+
+/*Posting Comment Form*/
+#createComment {
+  display: grid;
+  grid-template-columns: 12vw 85vw;
+  grid-template-rows: repeat(3, 1fr);
+  grid-row-gap: 10px;
+  text-align: left;
+  margin-bottom: 0px;
+  margin-top: 20px;
+  padding: 0 10px;
+}
+#userInput {
+  font-size: 24px;
+}
+#commentInput {
+  resize: vertical;
+  font-size: 0.8rem;
+}
+#submitButton {
+  grid-area: 3/1/3/3;
+  width: 400px;
+  height: 50px;
+  align-self: center;
+  justify-self: center;
+}
+
+.commentSeperator {
+  color: rgba(231, 228, 229, 0.4);
+  width: 80vw ;
+  margin: 2% auto;
+}
+
+/*Comment Posted Section*/
+#commentSection {
+  display: grid;
+  grid-template-rows: 100px 1fr;
+  text-align: left;
+  width: 80vw;
+  line-height: 10px;
+  padding: 20px 0 5px 30px;
+  margin: 0 auto;
+  margin-bottom: 40px;
+  background-color: rgba(215, 212, 212, 0.5);
+  border: 1px solid black;
+  border-radius: 3px;
+}
+#userProfile {
+  display: flex;
+  align-items: center;
+}
+#userImage {
+  height: 50xpx;
+  width: 90px;
+  padding: 10px 35px;
+}
+#userName {
+  margin-top: 0px;
+}
+#commentDate {
+  font-size: 0.8rem;
+}
+#newComment {
+  line-height: 25px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  width: 79vw;
+}
+
+/*Mobile Phone & Narrow Window Styling*/
+/*Grid changed to one character per row*/
 @media (max-width: 1000px) {
   #poster {
     left: 50%;
     transform: translate(-50%);
   }
+
   h1 {
     margin: 74vh 0 0 0;
     text-align: center;
     font-size: 42px;
   }
+
   #synopsis, #characters {
     margin-left: 30px;
   }
+
   #characterHeader {grid-area: 1/1/1/3;}
   #characters {
     grid-template-columns: 0.2fr 0.8fr;
-    grid-template-rows: 70px 1fr 1fr;
+    grid-template-rows: 70px 0.2fr 0.4fr 0.2fr 0.2fr;
+  }
+
+  #createComment {
+    display: flex;
+    flex-direction: column;
+  }
+  #userInput, #commentInput {
+    margin-left: 5px;
   }
 }
