@@ -1,4 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
+@font-face {
+  font-family: "Star_Wars";
+  src: url("fonts/Star_Wars.ttf");
+}
 
 :root {
   --blueHighlight: rgb(81, 54, 255);
@@ -10,7 +14,6 @@ html {
   font-family: 'Raleway', sans-serif;
   line-height: 30px;
   text-align: justify;
-  background-color: rgba(231, 231, 231, 0.5);
   overflow-x: hidden;
 }
 
@@ -25,43 +28,52 @@ html {
 }
 #poster {
   position: absolute;
+  display: block;
   left: 100px;
   top: 20vh;
-  width: 16vw;
-  height: 50vh;
-  border: 4px solid rgba(230, 247, 36);
-  border-radius: 3px;
-  transition: width 0.2s linear, height 0.2s linear;
+  width: 380px;
+  height: 60vh;
+  border: 5px solid rgba(230, 247, 36, 0.9);
+  border-radius: 5px;
+  box-shadow: 0 0 15px blue;
+  transition: width 0.2s linear, height 0.2s linear, box-shadow 0.2s linear;
 }
 #poster:hover {
-  width: 16.5vw;
-  height: 50.5vh;
+  width: 20.2vw;
+  height: 60.5vh;
+  box-shadow: 0 0 20px blue;
 }
 
 /*Headers*/
 h1 {
-  margin: 53vh 0 180px 420px;
+  margin: 60vh 0 20vh 540px;
+  line-height: 90px;
+  text-align: left;
+  font-family: "Star_Wars";
   font-weight: bold;
-  font-size: 52px;
+  font-size: 3rem;
+}
+h2 {
+  font-size: 2rem;
+  font-weight: bold;
 }
 a {
   text-decoration: none;
   color: rgb(0, 0, 0);
   margin-top: 0px;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   transition-duration: 0.2s;
 }
 a:hover {
   text-shadow: 1px 1px 5px rgba(70, 149, 241, 0.8);
-  font-size: 1.22rem;
+  font-size: 1.55rem;
 }
 
 /*Body paragraphs*/
 #synopsis, #characters {
-  width: 90%;
-  margin-left: 95px;
-  margin-top: 10%;
+  width: 88vw;
+  margin-left: 5vw;
 }
 
 /*Characters Grid Container*/
@@ -69,10 +81,10 @@ a:hover {
 #characters {
   display: grid;
   grid-template-columns: repeat(2, 0.2fr 0.3fr);
-  grid-template-rows: 70px 1fr 1fr;
+  grid-template-rows: 70px 1fr 100%;
   grid-gap: 50px 50px;
-  margin-top: 5%;
-  margin-bottom: 2%;
+  margin-top: 3%;
+  margin-bottom: 5%;
 }
 .characterPortrait {
   width: 100%;
@@ -141,7 +153,7 @@ a:hover {
 }
 
 /*Comment Posted Section*/
-#commentSection {
+.commentItem {
   display: grid;
   grid-template-rows: 0.2 0.8fr;
   text-align: left;
@@ -154,73 +166,88 @@ a:hover {
   border: 1px solid black;
   border-radius: 3px;
 }
-#userProfile {
+.userProfile {
   display: flex;
   align-items: center;
 }
-#userImage {
+.userImage {
   height: 50xpx;
   width: 90px;
   padding: 10px 35px;
 }
-#userName {
+.userName {
   margin-top: 0px;
   margin-bottom: 10px;
-  width: 60vw;
+  max-width: 60vw;
   line-height: 30px;
   word-wrap: break-word;
   white-space: pre-wrap;
 }
-#commentDate {
+.commentDate {
   font-size: 0.8rem;
 }
-#newComment {
-  line-height: 25px;
+.newComment {
+  line-height: 30px;
   word-wrap: break-word;
   white-space: pre-wrap;
   width: 79vw;
 }
 
+/*Edit Delete Dropdown*/
+.dropdown {
+  display: inline-block;
+  position: absolute;
+  right: 9vw;
+  margin-top: -50px;
+}
+
+.dropdownButton {
+  border: none;
+  background-color: inherit;
+  color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+}
+.dropdownButton:after {
+  content: '\2807';
+  font-size: 30px;
+  background-color: none;
+}
+.dropdownButton:hover {
+  color: rgb(0, 0, 0);
+}
+.dropdownContent {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: rgb(255, 255, 255);
+  min-width: 160px;
+  margin: 0;
+  overflow: hidden;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+.dropdownContent p {
+  display: block;
+  padding: 20px 20px;
+  margin-top: 0;
+  margin-bottom: 0;
+  text-align: right;
+  cursor: pointer;
+}
+.dropdownContent p:hover {
+  background-color: rgba(185, 185, 185, 0.3);
+  height: 1fr;
+}
+.show {
+  display: block;
+}
+
+
 /*Mobile Phone & Narrow Window Styling*/
 /*Grid changed to one character per row*/
 @media (max-width: 1000px) {
-  #poster {
-    width: 30vw;
-    left: 50%;
-    transform: translate(-50%);
-  }
-  #poster:hover {
-    width: 30.5vw;
-  }
-
-  h1 {
-    margin: 74vh 0 0 0;
-    text-align: center;
-    font-size: 42px;
-  }
-
-  #synopsis, #characters {
-    margin-left: 30px;
-  }
-
-  #characterHeader {grid-area: 1/1/1/3;}
-  #characters {
-    grid-template-columns: 0.2fr 0.8fr;
-    grid-template-rows: 70px 0.2fr 0.4fr 0.2fr 0.2fr;
-  }
-
-  #createComment {
-    display: flex;
-    flex-direction: column;
-  }
-  #userInput, #commentInput {
-    margin: 10px 0 20px 5px;
-  }
-  #submitButton {
-    margin-top: 10px;
-  }
-}
-@media (min-height: 1000px) {
   html {
     font-size: 40px;
     line-height: 50px;
@@ -230,23 +257,61 @@ a:hover {
   }
 
   #poster {
-    width: 50vw;
+    width: 32vh;
+    height: 40vh;
+    margin-top: 0;
+    left: 50%;
+    transform: translate(-50%);
   }
   #poster:hover {
-    width: 50.5vw;
+    width: 32.5vh;
+    height: 40.5vh;
   }
 
   h1 {
-    font-size: 85px;
+    margin: 70vh 0 15vh 0;
+    line-height: 90px;
+    text-align: center;
+    font-size: 80px;
   }
-  #characters {
-    grid-template-rows: 110px 0.2fr 0.4fr 0.2fr 0.2fr;
+  h2 {
+    font-size: 60px;
+  }
+  a {
+    font-size: 45px;
   }
 
+  #synopsis, #characters {
+    margin-left: 30px;
+  }
+
+  #characterHeader {
+    grid-area: 1/1/1/3;
+  }
+  #characters {
+    grid-template-columns: 0.2fr 0.8fr;
+    grid-template-rows: 10vh 0.2fr 0.4fr 0.2fr 0.2fr;
+  }
+
+  #createComment {
+    display: flex;
+    flex-direction: column;
+  }
   #userInput, #commentInput {
+    width: 90vw;
+    margin: 10px 0 20px 5px;
+    font-size: 50px;
+  }
+  label {
     font-size: 50px;
   }
   #submitButton {
-    font-size: 30px;
+    margin-top: 10px;
+    font-size: 50px;
+    height: 70px;
+  }
+
+  #newComment {
+    line-height: 50px;
   }
 }
