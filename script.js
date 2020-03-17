@@ -1,7 +1,11 @@
 /*On Document Load, pull existing comments from Local Storage
 Paste them to the Comment Storage Array*/
 let commentStorage = [];
+const body = document.querySelector("body");
 window.onload = function() {
+  /*No transitions on load*/
+  body.classList.remove("preload");
+
   /*Clear Comment Input Values*/
   userInput.value = "";
   commentInput.value = "";
@@ -9,14 +13,19 @@ window.onload = function() {
   /*Load pre-existing comments if there are any*/
   if (localStorage.commentsArray) {
     let existingComments = JSON.parse(localStorage.commentsArray);
-    for (item in existingComments) {
-      //let updateStorage = [existingComments[item][0], existingComments[item][1]]
-      commentStorage.push(existingComments[item]);
-      createComment(existingComments[item].userName, existingComments[item].comment);
+
+    /*Comment Storage is built in reverse because
+    the Comment Section is newest to oldest (reversed)*/
+    let i = existingComments.length -1;
+    for (; i >= 0; i--) {
+      commentStorage.push(existingComments[i]);
+      createComment(existingComments[i].userName, existingComments[i].comment);
     }
   }
 }
 
+/*Clicking on window or another edit / delete dropdown
+closes dropdwon*/
 window.onclick = () => {
   if (!event.target.matches(".dropdownButton")) {
     let dropdownContent = document.querySelectorAll(".dropdownContent");
@@ -74,7 +83,7 @@ submitButton.addEventListener("click", () => {
 /*Save new comments posted*/
 function saveComment(userName, comment) {
   let newComment = {userName: userName, comment: comment};
-  commentStorage.push(newComment);
+  commentStorage.unshift(newComment);
 
   localStorage.clear();
   localStorage.setItem("commentsArray", JSON.stringify(commentStorage));
@@ -83,72 +92,148 @@ function saveComment(userName, comment) {
 /*Edit posted comment*/
 function editComment(e) {
   let commentItem = e.target.parentNode.parentNode.parentNode.parentNode;
-  let userPostDate = commentItem.children[0].children[1];
+  let userProfile = commentItem.children[0];
+  let userPostDate = userProfile.children[1];
   let userName = userPostDate.children[0];
   let postDate = userPostDate.children[1];
+  let dropdown = userProfile.children[2];
   let comment = commentItem.children[1];
 
-  const userInput = document.createElement("input");
-  const commentInput = document.createElement("input");
-  const saveEdit = document.createElement("button");
+  let userInput = document.createElement("input");
+  let commentInput = document.createElement("textarea");
+  let saveEdit = document.createElement("button");
+  let cancelEdit = document.createElement("button");
+
+  userInput.setAttribute("class", "editUsername");
+  commentInput.setAttribute("class", "editComment");
+  commentInput.setAttribute("rows", "3");
+  saveEdit.setAttribute("class", "saveEdit");
+  cancelEdit.setAttribute("class", "cancelEdit");
 
   userInput.value = userName.textContent;
   commentInput.value = comment.textContent;
+  saveEdit.textContent = "Save";
+  saveEdit.addEventListener("click", () => {
+    commentEdit(userInput.value, userName.textContent,
+             commentInput.value, comment.textContent,
+             commentItem.id);
+  });
+  cancelEdit.textContent = "Cancel";
+  cancelEdit.addEventListener("click", () => cancelEdit(commentItem.id));
 
   userName.remove();
   comment.remove();
+  dropdown.remove();
   userPostDate.insertBefore(userInput, postDate);
   commentItem.append(commentInput);
+  commentItem.append(saveEdit);
+}
+
+function commentEdit(userNameNew, userNameOriginal, commentNew, commentOriginal, id) {
+  if (userNameNew != userNameOriginal || commentNew != commentOriginal) {
+    let commentsArray = JSON.parse(localStorage.commentsArray);
+    commentsArray[id].userName = userNameNew;
+    commentsArray[id].comment = commentNew;
+    console.log(commentsArray);
+
+    localStorage.clear();
+    localStorage.setItem("commentsArray", JSON.stringify(commentsArray));
+  }
+  exitEdit(id);
+}
+function exitEdit(id) {
+  let commentSection = document.querySelector("#commentSection")
+  let commentItem = commentSection.querySelectorAll(".commentItem")[id];
+
+  let userPostDate = commentItem.querySelector(".userPostDate");
+  let commentDate = commentItem.querySelector(".commentDate");
+  let userInput = commentItem.querySelector(".editUsername");
+
+  let commentInput = commentItem.querySelector(".editComment");
+  let saveEdit = commentItem.querySelector(".saveEdit");
+
+  let userNameLabel = document.createElement("h4");
+  userNameLabel.setAttribute("class", "userName");
+  userNameLabel.textContent = userInput.value;
+
+  let newComment = document.createElement("pre");
+  newComment.setAttribute("class", "newComment");
+  newComment.textContent = commentInput.value;
+
+  userInput.remove();
+  userPostDate.insertBefore(userNameLabel, commentDate);
+
+  commentInput.remove();
+  commentItem.appendChild(newComment);
+
+  saveEdit.remove();
 }
 
 /*Delete posted comment*/
 function deleteComment(e) {
   let commentItem = e.target.parentNode.parentNode.parentNode.parentNode;
+  let commentsArray = JSON.parse(localStorage.commentsArray);
+  let removeComment = commentsArray.indexOf(commentsArray[commentItem.id]);
+
+  commentsArray.splice(removeComment, 1);
+
+  localStorage.clear();
+  localStorage.setItem("commentsArray", JSON.stringify(commentsArray));
   commentItem.previousSibling.remove();
-  commentItem.remove()
+  commentItem.remove();
+
+  commentSectionID();
 }
 
+//Number comment items with ID's
+function commentSectionID() {
+  let commentSection = document.querySelector("#commentSection");
+  let id = 0;
+  for (i = 0; i < commentSection.children.length; i++) {
+    if (commentSection.children[i].classList.contains("commentItem")){
+      commentSection.children[i].setAttribute("id", id++);
+    }
+  }
+}
+
+const months = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November",
+                "December"];
+let today = new Date();
 function createComment(userName, comment) {
-  const months = ["January", "February", "March", "April", "May", "June",
-                  "July", "August", "September", "October", "November",
-                  "December"];
-  let today = new Date();
-
-  const body = document.querySelector("body");
-
-  const commentSeperator = document.createElement("hr");
+  let commentSeperator = document.createElement("hr");
   commentSeperator.setAttribute("class", "commentSeperator");
 
-  const commentItem = document.createElement("section");
+  let commentItem = document.createElement("section");
   commentItem.setAttribute("class", "commentItem");
 
-  const userProfile = document.createElement("div");
+  let userProfile = document.createElement("div");
   userProfile.setAttribute("class", "userProfile");
-  const userPostDate = document.createElement("div");
+  let userPostDate = document.createElement("div");
   userPostDate.setAttribute("class", "userPostDate");
 
-  const userImage = document.createElement("img");
+  let userImage = document.createElement("img");
   userImage.setAttribute("src", "images/user.png");
   userImage.setAttribute("alt", "User image");
   userImage.setAttribute("class", "userImage");
 
-  const commentDate = document.createElement("span");
+  let commentDate = document.createElement("span");
   commentDate.setAttribute("class", "commentDate")
   commentDate.textContent = `${months[today.getMonth()]} ${today.getFullYear()}`;
 
-  const userNameLabel = document.createElement("h4");
+  let userNameLabel = document.createElement("h4");
   userNameLabel.setAttribute("class", "userName");
   userNameLabel.textContent = userName;
 
-  const newComment = document.createElement("pre");
+  let newComment = document.createElement("pre");
   newComment.setAttribute("class", "newComment");
   newComment.textContent = comment;
 
-  const dropdown = document.createElement("div");
-  const editDelete = document.createElement("button");
-  const dropdownContent = document.createElement("div");
-  const editButton = document.createElement("p");
-  const deleteButton = document.createElement("p");
+  let dropdown = document.createElement("div");
+  let editDelete = document.createElement("button");
+  let dropdownContent = document.createElement("div");
+  let editButton = document.createElement("p");
+  let deleteButton = document.createElement("p");
   dropdown.setAttribute("class", "dropdown");
   editDelete.addEventListener("click", () => dropdownContent.classList.toggle("show"));
   editDelete.setAttribute("class", "dropdownButton");
@@ -177,4 +262,6 @@ function createComment(userName, comment) {
   commentSection.insertBefore(commentSeperator, commentSection.firstChild);
 
   body.appendChild(commentSection);
+
+  commentSectionID();
 }

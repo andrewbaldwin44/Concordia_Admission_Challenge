@@ -8,6 +8,14 @@
   --blueHighlight: rgb(81, 54, 255);
 }
 
+/*No transitions on load*/
+.preload * {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -ms-transition: none !important;
+  -o-transition: none !important;
+}
+
 html {
   position: absolute;
   font-size: 24px;
@@ -113,7 +121,7 @@ a:hover {
   border-radius: 2px;
 }
 #userInput:focus, #commentInput:focus {
-  outline-color: var(--blueHighlight);
+  outline: 1px solid var(--blueHighlight);
 }
 #userInput {
   font-size: 24px;
@@ -130,8 +138,8 @@ a:hover {
   height: 50px;
   align-self: center;
   justify-self: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 30px;
+  margin-bottom: 15px;
   background-color: var(--blueHighlight);
   border: 2px solid black;
   border-radius: 5px;
@@ -190,7 +198,37 @@ a:hover {
   line-height: 30px;
   word-wrap: break-word;
   white-space: pre-wrap;
-  width: 79vw;
+  max-width: 79vw;
+}
+
+/*Edit Comment*/
+.editComment, .editUsername {
+  font-size: inherit;
+  padding: 10px 10px;
+  margin-bottom: 10px;
+}
+.editComment:focus, .editUsername:focus {
+  outline: 1px solid var(--blueHighlight);
+}
+.editUsername {
+  display: flex;
+  flex-direction: column;
+  width: 30vw;
+}
+.editComment {
+  resize: vertical;
+  max-width: 77vw;
+  margin-top: 10px;
+}
+.saveEdit {
+  justify-content: flex-end;
+  background-color: var(--blueHighlight);
+  border: none;
+  border-radius: 5px;
+  font-size: inherit;
+  width: 15vw;
+  height: 5vh;
+  margin: 10px 2.5vw 10px auto;
 }
 
 /*Edit Delete Dropdown*/
@@ -249,7 +287,7 @@ a:hover {
 /*Grid changed to one character per row*/
 @media (max-width: 1000px) {
   html {
-    font-size: 40px;
+    font-size: 45px;
     line-height: 50px;
   }
   #banner {
@@ -269,7 +307,7 @@ a:hover {
   }
 
   h1 {
-    margin: 70vh 0 15vh 0;
+    margin: 70vh 0 10vh 0;
     line-height: 90px;
     text-align: center;
     font-size: 80px;
@@ -279,6 +317,9 @@ a:hover {
   }
   a {
     font-size: 45px;
+  }
+  a:hover{
+    font-size: 46px;
   }
 
   #synopsis, #characters {
@@ -311,7 +352,16 @@ a:hover {
     height: 70px;
   }
 
-  #newComment {
+  .newComment {
     line-height: 50px;
+  }
+  .commentSeperator {
+    margin-top: 40px;
+    margin-bottom: 40px;
+
+  }
+
+  .editComment {
+    max-width: 75vw;
   }
 }
