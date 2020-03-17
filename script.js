@@ -1,7 +1,6 @@
-/*On Document Load, pull existing comments from Local Storage
-Paste them to the Comment Storage Array*/
 let commentStorage = [];
 const body = document.querySelector("body");
+
 window.onload = function() {
   /*No transitions on load*/
   body.classList.remove("preload");
@@ -10,7 +9,8 @@ window.onload = function() {
   userInput.value = "";
   commentInput.value = "";
 
-  /*Load pre-existing comments if there are any*/
+  /*On Document Load, pull existing comments from Local Storage
+  Paste them to the Comment Storage Array*/
   if (localStorage.commentsArray) {
     let existingComments = JSON.parse(localStorage.commentsArray);
 
@@ -18,14 +18,13 @@ window.onload = function() {
     the Comment Section is newest to oldest (reversed)*/
     let i = existingComments.length -1;
     for (; i >= 0; i--) {
-      commentStorage.push(existingComments[i]);
+      commentStorage.unshift(existingComments[i]);
       createComment(existingComments[i].userName, existingComments[i].comment);
     }
   }
 }
 
-/*Clicking on window or another edit / delete dropdown
-closes dropdwon*/
+//Clicking elsewhwere on window closes dropdown
 window.onclick = () => {
   if (!event.target.matches(".dropdownButton")) {
     let dropdownContent = document.querySelectorAll(".dropdownContent");
@@ -58,138 +57,127 @@ function buttonEnableDisable() {
 const submitButton = document.querySelector("#submitButton");
 
 submitButton.addEventListener("click", () => {
-  userName = document.querySelector("#userInput").value;
-  comment = document.querySelector("#commentInput").value;
+  userName = userInput.value;
+  comment = commentInput.value;
 
   if (userName && comment) {
-    submitButton.classList.remove("disabled");
     createComment(userName, comment);
+    saveComment(userName, comment);
 
-    /*Scroll Window to Added Comment*/
-    window.scrollTo(0, document.body.scrollHeight);
-
-    /*Save comment to Local Storage*/
-    saveComment(userInput.value, commentInput.value);
-
-    /*Clear Inputs*/
     userInput.value = "";
     commentInput.value = "";
 
-    /*Disable Button*/
-    submitButton.classList.add("disabled");
+    buttonEnableDisable();
   }
 });
 
-/*Save new comments posted*/
-function saveComment(userName, comment) {
-  let newComment = {userName: userName, comment: comment};
-  commentStorage.unshift(newComment);
-
+function setLocalStorage() {
   localStorage.clear();
   localStorage.setItem("commentsArray", JSON.stringify(commentStorage));
 }
 
-/*Edit posted comment*/
+const commentSection = document.querySelector("#commentSection");
+function queryCommentItem(commentItem) {
+  return {
+    userPostDate: commentItem.querySelector(".userPostDate"),
+    userName: commentItem.querySelector(".userName"),
+    postDate: commentItem.querySelector(".commentDate"),
+    dropdown: commentItem.querySelector(".dropdown"),
+    comment: commentItem.querySelector(".newComment")
+  }
+}
+
+function saveComment(userName, comment) {
+  let newComment = {userName: userName, comment: comment};
+  commentStorage.unshift(newComment);
+
+  setLocalStorage();
+}
+
 function editComment(e) {
   let commentItem = e.target.parentNode.parentNode.parentNode.parentNode;
-  let userProfile = commentItem.children[0];
-  let userPostDate = userProfile.children[1];
-  let userName = userPostDate.children[0];
-  let postDate = userPostDate.children[1];
-  let dropdown = userProfile.children[2];
-  let comment = commentItem.children[1];
+  let commentQuery = queryCommentItem(commentItem);
 
   let userInput = document.createElement("input");
   let commentInput = document.createElement("textarea");
+  let buttonInputs = document.createElement("div");
   let saveEdit = document.createElement("button");
   let cancelEdit = document.createElement("button");
 
   userInput.setAttribute("class", "editUsername");
   commentInput.setAttribute("class", "editComment");
   commentInput.setAttribute("rows", "3");
+  buttonInputs.setAttribute("class", "buttonInputs");
   saveEdit.setAttribute("class", "saveEdit");
-  cancelEdit.setAttribute("class", "cancelEdit");
+  cancelEdit.setAttribute("class", "saveEdit cancelEdit");
 
-  userInput.value = userName.textContent;
-  commentInput.value = comment.textContent;
+  userInput.value = commentQuery.userName.textContent;
+  commentInput.value = commentQuery.comment.textContent;
+
   saveEdit.textContent = "Save";
   saveEdit.addEventListener("click", () => {
-    commentEdit(userInput.value, userName.textContent,
-             commentInput.value, comment.textContent,
+    commentEdit(userInput.value, commentQuery.userName.textContent,
+             commentInput.value, commentQuery.comment.textContent,
              commentItem.id);
   });
-  cancelEdit.textContent = "Cancel";
-  cancelEdit.addEventListener("click", () => cancelEdit(commentItem.id));
 
-  userName.remove();
-  comment.remove();
-  dropdown.remove();
-  userPostDate.insertBefore(userInput, postDate);
+  cancelEdit.textContent = "Cancel";
+  cancelEdit.addEventListener("click", () => exitEdit(commentItem.id));
+
+  commentQuery.userName.remove();
+  commentQuery.comment.remove();
+  commentQuery.dropdown.remove();
+  commentQuery.userPostDate.insertBefore(userInput, commentQuery.postDate);
+  buttonInputs.append(saveEdit);
+  buttonInputs.append(cancelEdit);
   commentItem.append(commentInput);
-  commentItem.append(saveEdit);
+  commentItem.append(buttonInputs);
 }
 
 function commentEdit(userNameNew, userNameOriginal, commentNew, commentOriginal, id) {
   if (userNameNew != userNameOriginal || commentNew != commentOriginal) {
-    let commentsArray = JSON.parse(localStorage.commentsArray);
-    commentsArray[id].userName = userNameNew;
-    commentsArray[id].comment = commentNew;
-    console.log(commentsArray);
+    commentStorage[id].userName = userNameNew;
+    commentStorage[id].comment = commentNew;
 
-    localStorage.clear();
-    localStorage.setItem("commentsArray", JSON.stringify(commentsArray));
+    setLocalStorage();
   }
   exitEdit(id);
 }
 function exitEdit(id) {
-  let commentSection = document.querySelector("#commentSection")
   let commentItem = commentSection.querySelectorAll(".commentItem")[id];
+  let commentQuery = queryCommentItem(commentItem);
 
-  let userPostDate = commentItem.querySelector(".userPostDate");
-  let commentDate = commentItem.querySelector(".commentDate");
   let userInput = commentItem.querySelector(".editUsername");
-
   let commentInput = commentItem.querySelector(".editComment");
   let saveEdit = commentItem.querySelector(".saveEdit");
-
-  let userNameLabel = document.createElement("h4");
-  userNameLabel.setAttribute("class", "userName");
-  userNameLabel.textContent = userInput.value;
-
-  let newComment = document.createElement("pre");
-  newComment.setAttribute("class", "newComment");
-  newComment.textContent = commentInput.value;
+  let cancelEdit = commentItem.querySelector(".cancelEdit");
 
   userInput.remove();
-  userPostDate.insertBefore(userNameLabel, commentDate);
-
   commentInput.remove();
-  commentItem.appendChild(newComment);
-
   saveEdit.remove();
+  cancelEdit.remove();
 
+  createUserComment(commentItem, userInput.value, commentInput.value);
   createDropdown(commentItem);
 }
 
 /*Delete posted comment*/
 function deleteComment(e) {
   let commentItem = e.target.parentNode.parentNode.parentNode.parentNode;
-  let commentsArray = JSON.parse(localStorage.commentsArray);
-  let removeComment = commentsArray.indexOf(commentsArray[commentItem.id]);
+  let removeComment = commentStorage.indexOf(commentStorage[commentItem.id]);
 
-  commentsArray.splice(removeComment, 1);
-
-  localStorage.clear();
-  localStorage.setItem("commentsArray", JSON.stringify(commentsArray));
+  commentStorage.splice(removeComment, 1);
   commentItem.previousSibling.remove();
   commentItem.remove();
 
+  setLocalStorage();
   commentSectionID();
 }
 
 //Number comment items with ID's
 function commentSectionID() {
   let commentSection = document.querySelector("#commentSection");
+  let dropdown = commentSection.querySelector(".dropdown");
   let id = 0;
   for (i = 0; i < commentSection.children.length; i++) {
     if (commentSection.children[i].classList.contains("commentItem")){
@@ -198,20 +186,20 @@ function commentSectionID() {
   }
 }
 
-function toggleDropdown(dropdownContent) {
-  let dropdowns = document.querySelectorAll(".show");
-  if (dropdowns) {
-    for (i = 0; i < dropdowns.length; i++) {
-      dropdowns[i].classList.remove("show");
-    }
-  }
-  dropdownContent.classList.toggle("show");
-}
+function createUserComment(commentItem, userName, comment) {
+  let commentQuery = queryCommentItem(commentItem);
 
-const months = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November",
-                "December"];
-let today = new Date();
+  let userNameLabel = document.createElement("h4");
+  userNameLabel.setAttribute("class", "userName");
+  userNameLabel.textContent = userName;
+
+  let newComment = document.createElement("pre");
+  newComment.setAttribute("class", "newComment");
+  newComment.textContent = comment;
+
+  commentQuery.userPostDate.insertBefore(userNameLabel, commentQuery.postDate);
+  commentItem.appendChild(newComment);
+}
 
 function createDropdown(commentItem) {
   let dropdown = document.createElement("div");
@@ -243,6 +231,21 @@ function createDropdown(commentItem) {
   userProfile.append(dropdown);
 }
 
+function toggleDropdown(dropdownContent) {
+  let dropdowns = document.querySelectorAll(".show");
+  if (dropdowns) {
+    for (i = 0; i < dropdowns.length; i++) {
+      dropdowns[i].classList.remove("show");
+    }
+  }
+  dropdownContent.classList.toggle("show");
+}
+
+const months = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November",
+                "December"];
+let today = new Date();
+
 function createComment(userName, comment) {
   let commentSeperator = document.createElement("hr");
   commentSeperator.setAttribute("class", "commentSeperator");
@@ -262,30 +265,21 @@ function createComment(userName, comment) {
 
   let commentDate = document.createElement("span");
   commentDate.setAttribute("class", "commentDate")
-  commentDate.textContent = `${months[today.getMonth()]} ${today.getFullYear()}`;
+  commentDate.textContent = `${months[today.getMonth()]} ${today.getDay()}, ${today.getFullYear()}`;
 
-  let userNameLabel = document.createElement("h4");
-  userNameLabel.setAttribute("class", "userName");
-  userNameLabel.textContent = userName;
-
-  let newComment = document.createElement("pre");
-  newComment.setAttribute("class", "newComment");
-  newComment.textContent = comment;
-
-  userPostDate.appendChild(userNameLabel);
   userPostDate.appendChild(commentDate);
 
   userProfile.appendChild(userImage);
   userProfile.appendChild(userPostDate);
 
   commentItem.appendChild(userProfile);
-  commentItem.appendChild(newComment);
 
   commentSection.insertBefore(commentItem, commentSection.firstChild);
   commentSection.insertBefore(commentSeperator, commentSection.firstChild);
 
   body.appendChild(commentSection);
 
-  commentSectionID();
+  createUserComment(commentItem, userName, comment);
   createDropdown(commentItem);
+  commentSectionID();
 }

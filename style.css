@@ -220,15 +220,23 @@ a:hover {
   max-width: 77vw;
   margin-top: 10px;
 }
-.saveEdit {
+.buttonInputs {
+  display: flex;
   justify-content: flex-end;
+}
+.saveEdit {
   background-color: var(--blueHighlight);
-  border: none;
-  border-radius: 5px;
+  border: 1px solid black;
+  border-radius: 7px;
   font-size: inherit;
-  width: 15vw;
+  min-width: 15vw;
   height: 5vh;
-  margin: 10px 2.5vw 10px auto;
+  margin: 10px 0;
+}
+.cancelEdit {
+  background-color: rgba(0, 0, 0, 0.2);
+  margin-right: 2.2vw;
+  margin-left: 1vw;
 }
 
 /*Edit Delete Dropdown*/
@@ -368,4 +376,10 @@ a:hover {
   .editComment {
     max-width: 75vw;
   }
+
+  .dropdownButton:after {
+    font-size: 50px;
+  }
+  .dropdownContent p {
+    padding: 40px 20px 40px 50px;
 }
