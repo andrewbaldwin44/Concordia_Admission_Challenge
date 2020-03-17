@@ -167,6 +167,8 @@ function exitEdit(id) {
   commentItem.appendChild(newComment);
 
   saveEdit.remove();
+
+  createDropdown(commentItem);
 }
 
 /*Delete posted comment*/
@@ -196,10 +198,51 @@ function commentSectionID() {
   }
 }
 
+function toggleDropdown(dropdownContent) {
+  let dropdowns = document.querySelectorAll(".show");
+  if (dropdowns) {
+    for (i = 0; i < dropdowns.length; i++) {
+      dropdowns[i].classList.remove("show");
+    }
+  }
+  dropdownContent.classList.toggle("show");
+}
+
 const months = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November",
                 "December"];
 let today = new Date();
+
+function createDropdown(commentItem) {
+  let dropdown = document.createElement("div");
+  let editDelete = document.createElement("button");
+  let dropdownContent = document.createElement("div");
+  let editButton = document.createElement("p");
+  let deleteButton = document.createElement("p");
+  let userProfile = commentItem.querySelector(".userProfile");
+
+  dropdown.setAttribute("class", "dropdown");
+
+  editDelete.addEventListener("click", () => toggleDropdown(dropdownContent));
+  editDelete.setAttribute("class", "dropdownButton");
+
+  dropdownContent.setAttribute("class", "dropdownContent");
+
+  editButton.textContent = "edit";
+  editButton.addEventListener("click", editComment);
+
+  deleteButton.textContent = "delete";
+  deleteButton.addEventListener("click", deleteComment);
+
+  dropdownContent.appendChild(editButton);
+  dropdownContent.appendChild(deleteButton);
+
+  dropdown.appendChild(editDelete);
+  dropdown.appendChild(dropdownContent);
+
+  userProfile.append(dropdown);
+}
+
 function createComment(userName, comment) {
   let commentSeperator = document.createElement("hr");
   commentSeperator.setAttribute("class", "commentSeperator");
@@ -229,31 +272,11 @@ function createComment(userName, comment) {
   newComment.setAttribute("class", "newComment");
   newComment.textContent = comment;
 
-  let dropdown = document.createElement("div");
-  let editDelete = document.createElement("button");
-  let dropdownContent = document.createElement("div");
-  let editButton = document.createElement("p");
-  let deleteButton = document.createElement("p");
-  dropdown.setAttribute("class", "dropdown");
-  editDelete.addEventListener("click", () => dropdownContent.classList.toggle("show"));
-  editDelete.setAttribute("class", "dropdownButton");
-  dropdownContent.setAttribute("class", "dropdownContent");
-  editButton.textContent = "edit";
-  editButton.addEventListener("click", editComment)
-  deleteButton.textContent = "delete";
-  deleteButton.addEventListener("click", deleteComment)
-  dropdownContent.appendChild(editButton);
-  dropdownContent.appendChild(deleteButton);
-  dropdown.appendChild(editDelete);
-  dropdown.appendChild(dropdownContent);
-
-
   userPostDate.appendChild(userNameLabel);
   userPostDate.appendChild(commentDate);
 
   userProfile.appendChild(userImage);
   userProfile.appendChild(userPostDate);
-  userProfile.appendChild(dropdown);
 
   commentItem.appendChild(userProfile);
   commentItem.appendChild(newComment);
@@ -264,4 +287,5 @@ function createComment(userName, comment) {
   body.appendChild(commentSection);
 
   commentSectionID();
+  createDropdown(commentItem);
 }
