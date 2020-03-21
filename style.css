@@ -47,7 +47,7 @@ html {
   transition: width 0.2s linear, height 0.2s linear, box-shadow 0.2s linear;
 }
 #poster:hover {
-  width: 20.2vw;
+  width: 385px;
   height: 60.5vh;
   box-shadow: 0 0 20px blue;
 }
@@ -195,7 +195,7 @@ a:hover {
   font-size: 0.8rem;
 }
 .newComment {
-  line-height: 30px;
+  line-height: 35px;
   word-wrap: break-word;
   white-space: pre-wrap;
   max-width: 79vw;
@@ -274,15 +274,22 @@ a:hover {
   box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
   border-radius: 3px;
 }
-.dropdownContent p {
-  display: block;
-  padding: 20px 20px;
-  margin-top: 0;
-  margin-bottom: 0;
-  text-align: right;
-  cursor: pointer;
+.dropdownContent img {
+  height: 30px;
+  width: 30px;
 }
-.dropdownContent p:hover {
+.dropdownContent div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 10px 15px;
+}
+.editButton, .deleteButton {
+  font-weight:bold;
+  padding-left: 50px;
+}
+.dropdownContent div:hover {
   background-color: rgba(185, 185, 185, 0.3);
   height: 1fr;
 }
@@ -370,7 +377,9 @@ a:hover {
   .commentSeperator {
     margin-top: 40px;
     margin-bottom: 40px;
-
+  }
+  .userName {
+    margin-bottom: 20px;
   }
 
   .editComment {
@@ -380,6 +389,8 @@ a:hover {
   .dropdownButton:after {
     font-size: 50px;
   }
-  .dropdownContent p {
-    padding: 40px 20px 40px 50px;
+  .dropdownContent img {
+    height: 50px;
+    width: 50px;
+  }
 }

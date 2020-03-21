@@ -19,8 +19,10 @@ window.onload = function() {
     let i = existingComments.length -1;
     for (; i >= 0; i--) {
       commentStorage.unshift(existingComments[i]);
-      createComment(existingComments[i].userName, existingComments[i].comment);
+      createComment();
+      createUserComment(0, existingComments[i].userName, existingComments[i].comment, existingComments[i].postDate);
     }
+    commentSectionID();
   }
 }
 
@@ -61,7 +63,9 @@ submitButton.addEventListener("click", () => {
   comment = commentInput.value;
 
   if (userName && comment) {
-    createComment(userName, comment);
+    createComment();
+    createUserComment(0, userName, comment);
+    commentSectionID();
     saveComment(userName, comment);
 
     userInput.value = "";
@@ -87,15 +91,22 @@ function queryCommentItem(commentItem) {
   }
 }
 
-function saveComment(userName, comment) {
-  let newComment = {userName: userName, comment: comment};
+const months = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November",
+                "December"];
+let today = new Date();
+let todaysDate = `${months[today.getMonth()]} ${today.getDay()}, ${today.getFullYear()}`
+
+function saveComment(userName, comment, commentDate = todaysDate) {
+  let newComment = {userName: userName, postDate: commentDate, comment: comment};
   commentStorage.unshift(newComment);
 
   setLocalStorage();
 }
 
 function editComment(e) {
-  let commentItem = e.target.parentNode.parentNode.parentNode.parentNode;
+  let id = e.target.id.replace(/\D/g,'');
+  let commentItem = commentSection.querySelector(`#item${id}`);
   let commentQuery = queryCommentItem(commentItem);
 
   let userInput = document.createElement("input");
@@ -118,16 +129,17 @@ function editComment(e) {
   saveEdit.addEventListener("click", () => {
     commentEdit(userInput.value, commentQuery.userName.textContent,
              commentInput.value, commentQuery.comment.textContent,
-             commentItem.id);
+             id);
   });
 
   cancelEdit.textContent = "Cancel";
-  cancelEdit.addEventListener("click", () => exitEdit(commentItem.id));
+  cancelEdit.addEventListener("click", () => exitEdit(id));
 
   commentQuery.userName.remove();
+  commentQuery.postDate.remove();
   commentQuery.comment.remove();
   commentQuery.dropdown.remove();
-  commentQuery.userPostDate.insertBefore(userInput, commentQuery.postDate);
+  commentQuery.userPostDate.append(userInput);
   buttonInputs.append(saveEdit);
   buttonInputs.append(cancelEdit);
   commentItem.append(commentInput);
@@ -137,6 +149,7 @@ function editComment(e) {
 function commentEdit(userNameNew, userNameOriginal, commentNew, commentOriginal, id) {
   if (userNameNew != userNameOriginal || commentNew != commentOriginal) {
     commentStorage[id].userName = userNameNew;
+    commentStorage[id].postDate = todaysDate;
     commentStorage[id].comment = commentNew;
 
     setLocalStorage();
@@ -144,27 +157,30 @@ function commentEdit(userNameNew, userNameOriginal, commentNew, commentOriginal,
   exitEdit(id);
 }
 function exitEdit(id) {
-  let commentItem = commentSection.querySelectorAll(".commentItem")[id];
-  let commentQuery = queryCommentItem(commentItem);
+  let commentItem = commentSection.querySelector(`#item${id}`);
 
   let userInput = commentItem.querySelector(".editUsername");
   let commentInput = commentItem.querySelector(".editComment");
-  let saveEdit = commentItem.querySelector(".saveEdit");
-  let cancelEdit = commentItem.querySelector(".cancelEdit");
+  let buttonInputs = commentItem.querySelector(".buttonInputs");
 
   userInput.remove();
   commentInput.remove();
-  saveEdit.remove();
-  cancelEdit.remove();
+  buttonInputs.remove();
 
-  createUserComment(commentItem, userInput.value, commentInput.value);
-  createDropdown(commentItem);
+  createUserComment(id, commentStorage[id].userName, commentStorage[id].comment, commentStorage[id].postDate);
+
+  let editButton = commentItem.querySelector(".editButton");
+  let deleteButton = commentItem.querySelector(".deleteButton");
+
+  editButton.setAttribute("id", `edit${id}`);
+  deleteButton.setAttribute("id", `delete${id}`);
 }
 
 /*Delete posted comment*/
 function deleteComment(e) {
-  let commentItem = e.target.parentNode.parentNode.parentNode.parentNode;
-  let removeComment = commentStorage.indexOf(commentStorage[commentItem.id]);
+  let id = e.target.id.replace(/\D/g,'');
+  let commentItem = commentSection.querySelector(`#item${id}`);
+  let removeComment = commentStorage.indexOf(commentStorage[id]);
 
   commentStorage.splice(removeComment, 1);
   commentItem.previousSibling.remove();
@@ -177,36 +193,56 @@ function deleteComment(e) {
 //Number comment items with ID's
 function commentSectionID() {
   let commentSection = document.querySelector("#commentSection");
-  let dropdown = commentSection.querySelector(".dropdown");
+
   let id = 0;
   for (i = 0; i < commentSection.children.length; i++) {
-    if (commentSection.children[i].classList.contains("commentItem")){
-      commentSection.children[i].setAttribute("id", id++);
+    let commentItem = commentSection.children[i];
+
+    if (commentItem.classList.contains("commentItem")){
+      let dropdownContent = commentItem.querySelector(".dropdownContent");
+      let editButton = commentItem.querySelector(".editButton");
+      let deleteButton = commentItem.querySelector(".deleteButton");
+      editButton.setAttribute("id", `edit${id}`);
+      deleteButton.setAttribute("id", `delete${id}`);
+      commentItem.setAttribute("id", `item${id++}`);
     }
   }
 }
 
-function createUserComment(commentItem, userName, comment) {
+function createUserComment(id, userName, comment, commentDate = todaysDate) {
+  let commentItem = document.querySelectorAll(".commentItem")[id];
   let commentQuery = queryCommentItem(commentItem);
 
   let userNameLabel = document.createElement("h4");
   userNameLabel.setAttribute("class", "userName");
   userNameLabel.textContent = userName;
 
+  let postDate = document.createElement("span");
+  postDate.setAttribute("class", "commentDate")
+  postDate.textContent = commentDate;
+
   let newComment = document.createElement("pre");
   newComment.setAttribute("class", "newComment");
   newComment.textContent = comment;
 
-  commentQuery.userPostDate.insertBefore(userNameLabel, commentQuery.postDate);
+  commentQuery.userPostDate.append(userNameLabel)
+  commentQuery.userPostDate.append(postDate);
   commentItem.appendChild(newComment);
+
+  createDropdown(commentItem);
 }
 
 function createDropdown(commentItem) {
   let dropdown = document.createElement("div");
   let editDelete = document.createElement("button");
   let dropdownContent = document.createElement("div");
+  let editImage = document.createElement("img");
   let editButton = document.createElement("p");
+  let editSelect = document.createElement("div");
+  let deleteImage = document.createElement("img");
   let deleteButton = document.createElement("p");
+  let deleteSelect = document.createElement("div");
+  let selectArea = document.createElement("div");
   let userProfile = commentItem.querySelector(".userProfile");
 
   dropdown.setAttribute("class", "dropdown");
@@ -218,12 +254,25 @@ function createDropdown(commentItem) {
 
   editButton.textContent = "edit";
   editButton.addEventListener("click", editComment);
+  editButton.setAttribute("class", "editButton");
 
   deleteButton.textContent = "delete";
   deleteButton.addEventListener("click", deleteComment);
+  deleteButton.setAttribute("class", "deleteButton");
 
-  dropdownContent.appendChild(editButton);
-  dropdownContent.appendChild(deleteButton);
+  editImage.setAttribute("src", "images/edit.png");
+  editImage.setAttribute("alt", "Dropdown edit");
+  editImage.setAttribute("class", "dropdownImages");
+  deleteImage.setAttribute("src", "images/delete.png");
+  deleteImage.setAttribute("alt", "Dropdown delete");
+  deleteImage.setAttribute("class", "dropdownImages");
+
+  editSelect.appendChild(editImage);
+  editSelect.appendChild(editButton);
+  deleteSelect.appendChild(deleteImage);
+  deleteSelect.appendChild(deleteButton);
+  dropdownContent.appendChild(editSelect);
+  dropdownContent.appendChild(deleteSelect);
 
   dropdown.appendChild(editDelete);
   dropdown.appendChild(dropdownContent);
@@ -233,20 +282,16 @@ function createDropdown(commentItem) {
 
 function toggleDropdown(dropdownContent) {
   let dropdowns = document.querySelectorAll(".show");
-  if (dropdowns) {
-    for (i = 0; i < dropdowns.length; i++) {
+
+  for (i = 0; i < dropdowns.length; i++) {
+    if (dropdowns[i] != dropdownContent) {
       dropdowns[i].classList.remove("show");
     }
   }
   dropdownContent.classList.toggle("show");
 }
 
-const months = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November",
-                "December"];
-let today = new Date();
-
-function createComment(userName, comment) {
+function createComment() {
   let commentSeperator = document.createElement("hr");
   commentSeperator.setAttribute("class", "commentSeperator");
 
@@ -263,12 +308,6 @@ function createComment(userName, comment) {
   userImage.setAttribute("alt", "User image");
   userImage.setAttribute("class", "userImage");
 
-  let commentDate = document.createElement("span");
-  commentDate.setAttribute("class", "commentDate")
-  commentDate.textContent = `${months[today.getMonth()]} ${today.getDay()}, ${today.getFullYear()}`;
-
-  userPostDate.appendChild(commentDate);
-
   userProfile.appendChild(userImage);
   userProfile.appendChild(userPostDate);
 
@@ -278,8 +317,4 @@ function createComment(userName, comment) {
   commentSection.insertBefore(commentSeperator, commentSection.firstChild);
 
   body.appendChild(commentSection);
-
-  createUserComment(commentItem, userName, comment);
-  createDropdown(commentItem);
-  commentSectionID();
 }
