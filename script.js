@@ -166,6 +166,7 @@ function editComment(e) {
   commentItem.append(commentInput);
   commentItem.append(buttonInputs);
 
+  document.querySelector(`#item${id}`).scrollIntoView();
   dropdownsEnableDisable();
 }
 function commentEdit(userNameNew, userNameOriginal, commentNew, commentOriginal, id) {
@@ -190,6 +191,7 @@ function exitEdit(id) {
   buttonInputs.remove();
 
   createUserComment(id, commentStorage[id].userName, commentStorage[id].comment, commentStorage[id].postDate);
+  commentSectionID();
 
   let editButton = commentItem.querySelector(".editButton");
   let deleteButton = commentItem.querySelector(".deleteButton");
