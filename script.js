@@ -1,6 +1,12 @@
 let commentStorage = [];
 const body = document.querySelector("body");
 
+const months = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November",
+                "December"];
+let today = new Date();
+let todaysDate = `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+
 window.onload = function() {
   /*No transitions on load*/
   body.classList.remove("preload");
@@ -73,6 +79,8 @@ submitButton.addEventListener("click", () => {
 
     buttonEnableDisable();
   }
+
+  document.querySelector("#mainSeperator").scrollIntoView();
 });
 
 function setLocalStorage() {
@@ -91,17 +99,29 @@ function queryCommentItem(commentItem) {
   }
 }
 
-const months = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November",
-                "December"];
-let today = new Date();
-let todaysDate = `${months[today.getMonth()]} ${today.getDay()}, ${today.getFullYear()}`
-
 function saveComment(userName, comment, commentDate = todaysDate) {
   let newComment = {userName: userName, postDate: commentDate, comment: comment};
   commentStorage.unshift(newComment);
 
   setLocalStorage();
+}
+
+function dropdownsEnableDisable() {
+  let dropdownButtons = [...document.querySelectorAll(".dropdownButton")];
+  let editMode = document.querySelector(".editComment");
+
+  if (editMode) {
+    dropdownButtons.map(button => {
+      button.classList.add("disabled");
+      button.disabled = true;
+    });
+  }
+  else {
+    dropdownButtons.map(button => {
+      button.classList.remove("disabled");
+      button.disabled = false;
+    });
+  }
 }
 
 function editComment(e) {
@@ -128,8 +148,8 @@ function editComment(e) {
   saveEdit.textContent = "Save";
   saveEdit.addEventListener("click", () => {
     commentEdit(userInput.value, commentQuery.userName.textContent,
-             commentInput.value, commentQuery.comment.textContent,
-             id);
+                commentInput.value, commentQuery.comment.textContent,
+                id);
   });
 
   cancelEdit.textContent = "Cancel";
@@ -140,12 +160,14 @@ function editComment(e) {
   commentQuery.comment.remove();
   commentQuery.dropdown.remove();
   commentQuery.userPostDate.append(userInput);
+
   buttonInputs.append(saveEdit);
   buttonInputs.append(cancelEdit);
   commentItem.append(commentInput);
   commentItem.append(buttonInputs);
-}
 
+  dropdownsEnableDisable();
+}
 function commentEdit(userNameNew, userNameOriginal, commentNew, commentOriginal, id) {
   if (userNameNew != userNameOriginal || commentNew != commentOriginal) {
     commentStorage[id].userName = userNameNew;
@@ -174,6 +196,8 @@ function exitEdit(id) {
 
   editButton.setAttribute("id", `edit${id}`);
   deleteButton.setAttribute("id", `delete${id}`);
+
+  dropdownsEnableDisable();
 }
 
 /*Delete posted comment*/
@@ -201,9 +225,18 @@ function commentSectionID() {
     if (commentItem.classList.contains("commentItem")){
       let dropdownContent = commentItem.querySelector(".dropdownContent");
       let editButton = commentItem.querySelector(".editButton");
+      let editImage = commentItem.querySelector(".editImage");
+      let editSelect = commentItem.querySelector(".editSelect");
       let deleteButton = commentItem.querySelector(".deleteButton");
-      editButton.setAttribute("id", `edit${id}`);
-      deleteButton.setAttribute("id", `delete${id}`);
+      let deleteImage = commentItem.querySelector(".deleteImage");
+      let deleteSelect = commentItem.querySelector(".deleteSelect");
+
+      editButton.setAttribute("id", `editButton${id}`);
+      editImage.setAttribute("id", `editImage${id}`);
+      editSelect.setAttribute("id", `edit${id}`);
+      deleteButton.setAttribute("id", `deleteButton${id}`);
+      deleteImage.setAttribute("id", `deleteImage${id}`);
+      deleteSelect.setAttribute("id", `delete${id}`);
       commentItem.setAttribute("id", `item${id++}`);
     }
   }
@@ -253,24 +286,30 @@ function createDropdown(commentItem) {
   dropdownContent.setAttribute("class", "dropdownContent");
 
   editButton.textContent = "edit";
-  editButton.addEventListener("click", editComment);
   editButton.setAttribute("class", "editButton");
 
   deleteButton.textContent = "delete";
-  deleteButton.addEventListener("click", deleteComment);
   deleteButton.setAttribute("class", "deleteButton");
 
   editImage.setAttribute("src", "images/edit.png");
   editImage.setAttribute("alt", "Dropdown edit");
   editImage.setAttribute("class", "dropdownImages");
+  editImage.classList.add("editImage");
   deleteImage.setAttribute("src", "images/delete.png");
   deleteImage.setAttribute("alt", "Dropdown delete");
   deleteImage.setAttribute("class", "dropdownImages");
+  deleteImage.classList.add("deleteImage");
 
   editSelect.appendChild(editImage);
   editSelect.appendChild(editButton);
+  editSelect.setAttribute("class", "editSelect");
+  editSelect.addEventListener("click", editComment);
+
   deleteSelect.appendChild(deleteImage);
   deleteSelect.appendChild(deleteButton);
+  deleteSelect.setAttribute("class", "deleteSelect");
+  deleteSelect.addEventListener("click", deleteComment);
+
   dropdownContent.appendChild(editSelect);
   dropdownContent.appendChild(deleteSelect);
 
