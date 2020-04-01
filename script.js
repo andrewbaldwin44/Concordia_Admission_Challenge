@@ -1,34 +1,246 @@
-let commentStorage = [];
+class Comment {
+  constructor(userName, comment, commentDate = todaysDate) {
+    this.commentSection = document.querySelector("#commentSection");
+    this.commentSeperator = document.createElement("hr");
+    this.commentItem = document.createElement("section");
+    this.userProfile = document.createElement("div");
+    this.userImage = document.createElement("img");
+    this.userNameLabel = document.createElement("h4");
+    this.userPostDate = document.createElement("div");
+    this.postDate = document.createElement("span");
+    this.newComment = document.createElement("pre");
+
+    this.userName = userName;
+    this.commentDate = commentDate;
+    this.comment = comment
+    this.userNameLabel.textContent = this.userName;
+    this.postDate.textContent = this.commentDate;
+    this.newComment.textContent = this.comment;
+
+    this.dropdown = document.createElement("div");
+    this.dropdownButton = document.createElement("button");
+    this.dropdownContent = document.createElement("div");
+    this.editImage = document.createElement("img");
+    this.editButton = document.createElement("p");
+    this.editSelect = document.createElement("div");
+    this.deleteImage = document.createElement("img");
+    this.deleteButton = document.createElement("p");
+    this.deleteSelect = document.createElement("div");
+    this.selectArea = document.createElement("div");
+
+    this.id = Array.prototype.indexOf.call(this.commentSection.childNodes, this.commentItem); //Find item in Local Storage
+
+    this.createComment();
+    this.createDropdown();
+  }
+
+  createComment() {
+    this.commentSeperator.setAttribute("class", "commentSeperator");
+    this.commentItem.setAttribute("class", "commentItem");
+    this.userProfile.setAttribute("class", "userProfile");
+    this.userPostDate.setAttribute("class", "userPostDate");
+    this.userImage.setAttribute("src", "images/user.png");
+    this.userImage.setAttribute("alt", "User image");
+    this.userImage.setAttribute("class", "userImage");
+    this.userNameLabel.setAttribute("class", "userName");
+    this.postDate.setAttribute("class", "commentDate")
+    this.newComment.setAttribute("class", "newComment");
+
+    this.userPostDate.append(this.userNameLabel)
+    this.userPostDate.append(this.postDate);
+    this.userProfile.appendChild(this.userImage);
+    this.userProfile.appendChild(this.userPostDate);
+    this.commentItem.appendChild(this.userProfile);
+    this.commentItem.appendChild(this.newComment);
+
+    this.commentSection.insertBefore(this.commentItem, this.commentSection.firstChild);
+    this.commentSection.insertBefore(this.commentSeperator, this.commentSection.firstChild);
+  }
+
+  createDropdown() {
+    this.dropdown.setAttribute("class", "dropdown");
+
+    this.dropdownButton.addEventListener("click", () => this.toggleDropdown(this));
+    this.dropdownButton.setAttribute("class", "dropdownButton");
+
+    this.dropdownContent.setAttribute("class", "dropdownContent");
+
+    this.editButton.textContent = "edit";
+    this.editButton.setAttribute("class", "editButton");
+
+    this.deleteButton.textContent = "delete";
+    this.deleteButton.setAttribute("class", "deleteButton");
+
+    this.editImage.setAttribute("src", "images/edit.png");
+    this.editImage.setAttribute("alt", "Dropdown edit");
+    this.editImage.setAttribute("class", "dropdownImages");
+    this.editImage.classList.add("editImage");
+
+    this.deleteImage.setAttribute("src", "images/delete.png");
+    this.deleteImage.setAttribute("alt", "Dropdown delete");
+    this.deleteImage.setAttribute("class", "dropdownImages");
+    this.deleteImage.classList.add("deleteImage");
+
+    this.editSelect.appendChild(this.editImage);
+    this.editSelect.appendChild(this.editButton);
+    this.editSelect.setAttribute("class", "editSelect");
+    this.editSelect.addEventListener("click", () => this.editComment());
+
+    this.deleteSelect.appendChild(this.deleteImage);
+    this.deleteSelect.appendChild(this.deleteButton);
+    this.deleteSelect.setAttribute("class", "deleteSelect");
+    this.deleteSelect.addEventListener("click", () => this.deleteComment());
+
+    this.dropdownContent.appendChild(this.editSelect);
+    this.dropdownContent.appendChild(this.deleteSelect);
+
+    this.dropdown.appendChild(this.dropdownButton);
+    this.dropdown.appendChild(this.dropdownContent);
+
+    this.userProfile.append(this.dropdown);
+  }
+
+  toggleDropdown() {
+    this.allDropdowns = document.querySelectorAll(".show");
+
+    //Only one dropdown can open at a time
+    for (let i = 0; i < this.allDropdowns.length; i++) {
+      if (this.allDropdowns[i] != this.dropdownContent) {
+        this.allDropdowns[i].classList.remove("show");
+      }
+    }
+    this.dropdownContent.classList.toggle("show");
+  }
+
+  dropdownsEnableDisable() {
+    this.dropdownButtons = [...document.querySelectorAll(".dropdownButton")];
+    this.editMode = document.querySelector(".editComment");
+
+    if (this.editMode) {
+      this.dropdownButtons.map(button => {
+        button.classList.add("disabled");
+        button.disabled = true;
+      });
+    }
+    else {
+      this.dropdownButtons.map(button => {
+        button.classList.remove("disabled");
+        button.disabled = false;
+      });
+    }
+  }
+
+  saveComment() {
+    this.commentData = {userName: this.userName, postDate: this.commentDate, comment: this.comment};
+    existingComments.unshift(this.commentData);
+
+    setLocalStorage();
+  }
+
+  editComment() {
+    this.userInput = document.createElement("input");
+    this.commentInput = document.createElement("textarea");
+    this.buttonInputs = document.createElement("div");
+    this.saveEdit = document.createElement("button");
+    this.cancelEdit = document.createElement("button");
+
+    this.userInput.setAttribute("class", "editUsername");
+    this.commentInput.setAttribute("class", "editComment");
+    this.commentInput.setAttribute("rows", "3");
+    this.buttonInputs.setAttribute("class", "buttonInputs");
+    this.saveEdit.setAttribute("class", "saveEdit");
+    this.cancelEdit.setAttribute("class", "saveEdit cancelEdit");
+
+    this.userInput.value = this.userName;
+    this.commentInput.value = this.comment;
+
+    this.saveEdit.textContent = "Save";
+    this.saveEdit.addEventListener("click", () => this.saveCommentEdit());
+
+    this.cancelEdit.textContent = "Cancel";
+    this.cancelEdit.addEventListener("click", () => this.exitEdit());
+
+    this.userNameLabel.remove();
+    this.postDate.remove();
+    this.newComment.remove();
+    this.dropdown.remove();
+
+    this.userPostDate.append(this.userInput);
+    this.commentItem.append(this.commentInput);
+    this.buttonInputs.append(this.saveEdit);
+    this.buttonInputs.append(this.cancelEdit);
+    this.commentItem.append(this.buttonInputs);
+
+    this.commentItem.scrollIntoView();
+    this.dropdownsEnableDisable();
+  }
+
+  saveCommentEdit() {
+    //if changes have been made
+    if (this.userInput.value != this.userNameLabel.textContent || this.commentInput.value != this.newComment.textContent) {
+      existingComments[this.id].userName = this.userInput.value;
+      existingComments[this.id].postDate = todaysDate;
+      existingComments[this.id].comment = this.commentInput.value;
+
+      setLocalStorage();
+    }
+    this.exitEdit();
+  }
+
+  exitEdit() {
+    this.userInput.remove();
+    this.commentInput.remove();
+    this.buttonInputs.remove();
+
+    console.log(this.commentItem);
+    console.log(this.id);
+    console.log(existingComments);
+
+    this.userNameLabel.textContent = existingComments[this.id].userName;
+    this.newComment.textContent = existingComments[this.id].comment;
+    this.postDate.textContent = existingComments[this.id].postDate;
+
+    this.createComment()
+    this.createDropdown()
+    this.dropdownsEnableDisable();
+  }
+
+  deleteComment() {
+    existingComments.splice(this.id, 1);
+    this.commentSeperator.remove();
+    this.commentItem.remove();
+
+    setLocalStorage();
+  }
+}
+
+let existingComments = JSON.parse(localStorage.commentsArray);
+
 const body = document.querySelector("body");
+const userInput = document.querySelector("#userInput");
+const commentInput = document.querySelector("#commentInput");
+const submitButton = document.querySelector("#submitButton");
 
 const months = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November",
                 "December"];
-let today = new Date();
-let todaysDate = `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+const today = new Date();
+const todaysDate = `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
 
 window.onload = function() {
   /*No transitions on load*/
   body.classList.remove("preload");
 
-  /*Clear Comment Input Values*/
   userInput.value = "";
   commentInput.value = "";
 
-  /*On Document Load, pull existing comments from Local Storage
-  Paste them to the Comment Storage Array*/
-  if (localStorage.commentsArray) {
-    let existingComments = JSON.parse(localStorage.commentsArray);
-
-    /*Comment Storage is built in reverse because
-    the Comment Section is newest to oldest (reversed)*/
+  if (existingComments) {
+    /*Comment Section is newest to oldest (reversed)*/
     let i = existingComments.length -1;
     for (; i >= 0; i--) {
-      commentStorage.unshift(existingComments[i]);
-      createComment();
-      createUserComment(0, existingComments[i].userName, existingComments[i].comment, existingComments[i].postDate);
+      new Comment(existingComments[i].userName, existingComments[i].comment, existingComments[i].postDate);
     }
-    commentSectionID();
+
   }
 }
 
@@ -45,12 +257,18 @@ window.onclick = () => {
   }
 }
 
-/*Enable / Disable submit button*/
-const userInput = document.querySelector("#userInput");
-const commentInput = document.querySelector("#commentInput");
-
 userInput.addEventListener("input", buttonEnableDisable);
 commentInput.addEventListener("input", buttonEnableDisable);
+submitButton.addEventListener("click", () => {
+  new Comment(userInput.value, commentInput.value).saveComment();
+
+  userInput.value = "";
+  commentInput.value = "";
+
+  buttonEnableDisable();
+
+  document.querySelector("#mainSeperator").scrollIntoView();
+});
 
 function buttonEnableDisable() {
   if (userInput.value && commentInput.value) {
@@ -61,301 +279,7 @@ function buttonEnableDisable() {
   }
 }
 
-/*Action for comment submit button*/
-const submitButton = document.querySelector("#submitButton");
-
-submitButton.addEventListener("click", () => {
-  userName = userInput.value;
-  comment = commentInput.value;
-
-  if (userName && comment) {
-    createComment();
-    createUserComment(0, userName, comment);
-    commentSectionID();
-    saveComment(userName, comment);
-
-    userInput.value = "";
-    commentInput.value = "";
-
-    buttonEnableDisable();
-  }
-
-  document.querySelector("#mainSeperator").scrollIntoView();
-});
-
 function setLocalStorage() {
   localStorage.clear();
-  localStorage.setItem("commentsArray", JSON.stringify(commentStorage));
-}
-
-const commentSection = document.querySelector("#commentSection");
-function queryCommentItem(commentItem) {
-  return {
-    userPostDate: commentItem.querySelector(".userPostDate"),
-    userName: commentItem.querySelector(".userName"),
-    postDate: commentItem.querySelector(".commentDate"),
-    dropdown: commentItem.querySelector(".dropdown"),
-    comment: commentItem.querySelector(".newComment")
-  }
-}
-
-function saveComment(userName, comment, commentDate = todaysDate) {
-  let newComment = {userName: userName, postDate: commentDate, comment: comment};
-  commentStorage.unshift(newComment);
-
-  setLocalStorage();
-}
-
-function dropdownsEnableDisable() {
-  let dropdownButtons = [...document.querySelectorAll(".dropdownButton")];
-  let editMode = document.querySelector(".editComment");
-
-  if (editMode) {
-    dropdownButtons.map(button => {
-      button.classList.add("disabled");
-      button.disabled = true;
-    });
-  }
-  else {
-    dropdownButtons.map(button => {
-      button.classList.remove("disabled");
-      button.disabled = false;
-    });
-  }
-}
-
-function editComment(e) {
-  let id = e.target.id.replace(/\D/g,'');
-  let commentItem = commentSection.querySelector(`#item${id}`);
-  let commentQuery = queryCommentItem(commentItem);
-
-  let userInput = document.createElement("input");
-  let commentInput = document.createElement("textarea");
-  let buttonInputs = document.createElement("div");
-  let saveEdit = document.createElement("button");
-  let cancelEdit = document.createElement("button");
-
-  userInput.setAttribute("class", "editUsername");
-  commentInput.setAttribute("class", "editComment");
-  commentInput.setAttribute("rows", "3");
-  buttonInputs.setAttribute("class", "buttonInputs");
-  saveEdit.setAttribute("class", "saveEdit");
-  cancelEdit.setAttribute("class", "saveEdit cancelEdit");
-
-  userInput.value = commentQuery.userName.textContent;
-  commentInput.value = commentQuery.comment.textContent;
-
-  saveEdit.textContent = "Save";
-  saveEdit.addEventListener("click", () => {
-    commentEdit(userInput.value, commentQuery.userName.textContent,
-                commentInput.value, commentQuery.comment.textContent,
-                id);
-  });
-
-  cancelEdit.textContent = "Cancel";
-  cancelEdit.addEventListener("click", () => exitEdit(id));
-
-  commentQuery.userName.remove();
-  commentQuery.postDate.remove();
-  commentQuery.comment.remove();
-  commentQuery.dropdown.remove();
-  commentQuery.userPostDate.append(userInput);
-
-  buttonInputs.append(saveEdit);
-  buttonInputs.append(cancelEdit);
-  commentItem.append(commentInput);
-  commentItem.append(buttonInputs);
-
-  document.querySelector(`#item${id}`).scrollIntoView();
-  dropdownsEnableDisable();
-}
-function commentEdit(userNameNew, userNameOriginal, commentNew, commentOriginal, id) {
-  if (userNameNew != userNameOriginal || commentNew != commentOriginal) {
-    commentStorage[id].userName = userNameNew;
-    commentStorage[id].postDate = todaysDate;
-    commentStorage[id].comment = commentNew;
-
-    setLocalStorage();
-  }
-  exitEdit(id);
-}
-function exitEdit(id) {
-  let commentItem = commentSection.querySelector(`#item${id}`);
-
-  let userInput = commentItem.querySelector(".editUsername");
-  let commentInput = commentItem.querySelector(".editComment");
-  let buttonInputs = commentItem.querySelector(".buttonInputs");
-
-  userInput.remove();
-  commentInput.remove();
-  buttonInputs.remove();
-
-  createUserComment(id, commentStorage[id].userName, commentStorage[id].comment, commentStorage[id].postDate);
-  commentSectionID();
-
-  let editButton = commentItem.querySelector(".editButton");
-  let deleteButton = commentItem.querySelector(".deleteButton");
-
-  editButton.setAttribute("id", `edit${id}`);
-  deleteButton.setAttribute("id", `delete${id}`);
-
-  dropdownsEnableDisable();
-}
-
-/*Delete posted comment*/
-function deleteComment(e) {
-  let id = e.target.id.replace(/\D/g,'');
-  let commentItem = commentSection.querySelector(`#item${id}`);
-  let removeComment = commentStorage.indexOf(commentStorage[id]);
-
-  commentStorage.splice(removeComment, 1);
-  commentItem.previousSibling.remove();
-  commentItem.remove();
-
-  setLocalStorage();
-  commentSectionID();
-}
-
-//Number comment items with ID's
-function commentSectionID() {
-  let commentSection = document.querySelector("#commentSection");
-
-  let id = 0;
-  for (i = 0; i < commentSection.children.length; i++) {
-    let commentItem = commentSection.children[i];
-
-    if (commentItem.classList.contains("commentItem")){
-      let dropdownContent = commentItem.querySelector(".dropdownContent");
-      let editButton = commentItem.querySelector(".editButton");
-      let editImage = commentItem.querySelector(".editImage");
-      let editSelect = commentItem.querySelector(".editSelect");
-      let deleteButton = commentItem.querySelector(".deleteButton");
-      let deleteImage = commentItem.querySelector(".deleteImage");
-      let deleteSelect = commentItem.querySelector(".deleteSelect");
-
-      editButton.setAttribute("id", `editButton${id}`);
-      editImage.setAttribute("id", `editImage${id}`);
-      editSelect.setAttribute("id", `edit${id}`);
-      deleteButton.setAttribute("id", `deleteButton${id}`);
-      deleteImage.setAttribute("id", `deleteImage${id}`);
-      deleteSelect.setAttribute("id", `delete${id}`);
-      commentItem.setAttribute("id", `item${id++}`);
-    }
-  }
-}
-
-function createUserComment(id, userName, comment, commentDate = todaysDate) {
-  let commentItem = document.querySelectorAll(".commentItem")[id];
-  let commentQuery = queryCommentItem(commentItem);
-
-  let userNameLabel = document.createElement("h4");
-  userNameLabel.setAttribute("class", "userName");
-  userNameLabel.textContent = userName;
-
-  let postDate = document.createElement("span");
-  postDate.setAttribute("class", "commentDate")
-  postDate.textContent = commentDate;
-
-  let newComment = document.createElement("pre");
-  newComment.setAttribute("class", "newComment");
-  newComment.textContent = comment;
-
-  commentQuery.userPostDate.append(userNameLabel)
-  commentQuery.userPostDate.append(postDate);
-  commentItem.appendChild(newComment);
-
-  createDropdown(commentItem);
-}
-
-function createDropdown(commentItem) {
-  let dropdown = document.createElement("div");
-  let editDelete = document.createElement("button");
-  let dropdownContent = document.createElement("div");
-  let editImage = document.createElement("img");
-  let editButton = document.createElement("p");
-  let editSelect = document.createElement("div");
-  let deleteImage = document.createElement("img");
-  let deleteButton = document.createElement("p");
-  let deleteSelect = document.createElement("div");
-  let selectArea = document.createElement("div");
-  let userProfile = commentItem.querySelector(".userProfile");
-
-  dropdown.setAttribute("class", "dropdown");
-
-  editDelete.addEventListener("click", () => toggleDropdown(dropdownContent));
-  editDelete.setAttribute("class", "dropdownButton");
-
-  dropdownContent.setAttribute("class", "dropdownContent");
-
-  editButton.textContent = "edit";
-  editButton.setAttribute("class", "editButton");
-
-  deleteButton.textContent = "delete";
-  deleteButton.setAttribute("class", "deleteButton");
-
-  editImage.setAttribute("src", "images/edit.png");
-  editImage.setAttribute("alt", "Dropdown edit");
-  editImage.setAttribute("class", "dropdownImages");
-  editImage.classList.add("editImage");
-  deleteImage.setAttribute("src", "images/delete.png");
-  deleteImage.setAttribute("alt", "Dropdown delete");
-  deleteImage.setAttribute("class", "dropdownImages");
-  deleteImage.classList.add("deleteImage");
-
-  editSelect.appendChild(editImage);
-  editSelect.appendChild(editButton);
-  editSelect.setAttribute("class", "editSelect");
-  editSelect.addEventListener("click", editComment);
-
-  deleteSelect.appendChild(deleteImage);
-  deleteSelect.appendChild(deleteButton);
-  deleteSelect.setAttribute("class", "deleteSelect");
-  deleteSelect.addEventListener("click", deleteComment);
-
-  dropdownContent.appendChild(editSelect);
-  dropdownContent.appendChild(deleteSelect);
-
-  dropdown.appendChild(editDelete);
-  dropdown.appendChild(dropdownContent);
-
-  userProfile.append(dropdown);
-}
-
-function toggleDropdown(dropdownContent) {
-  let dropdowns = document.querySelectorAll(".show");
-
-  for (i = 0; i < dropdowns.length; i++) {
-    if (dropdowns[i] != dropdownContent) {
-      dropdowns[i].classList.remove("show");
-    }
-  }
-  dropdownContent.classList.toggle("show");
-}
-
-function createComment() {
-  let commentSeperator = document.createElement("hr");
-  commentSeperator.setAttribute("class", "commentSeperator");
-
-  let commentItem = document.createElement("section");
-  commentItem.setAttribute("class", "commentItem");
-
-  let userProfile = document.createElement("div");
-  userProfile.setAttribute("class", "userProfile");
-  let userPostDate = document.createElement("div");
-  userPostDate.setAttribute("class", "userPostDate");
-
-  let userImage = document.createElement("img");
-  userImage.setAttribute("src", "images/user.png");
-  userImage.setAttribute("alt", "User image");
-  userImage.setAttribute("class", "userImage");
-
-  userProfile.appendChild(userImage);
-  userProfile.appendChild(userPostDate);
-
-  commentItem.appendChild(userProfile);
-
-  commentSection.insertBefore(commentItem, commentSection.firstChild);
-  commentSection.insertBefore(commentSeperator, commentSection.firstChild);
-
-  body.appendChild(commentSection);
+  localStorage.setItem("commentsArray", JSON.stringify(existingComments));
 }
