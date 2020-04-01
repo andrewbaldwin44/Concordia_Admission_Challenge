@@ -28,8 +28,6 @@ class Comment {
     this.deleteSelect = document.createElement("div");
     this.selectArea = document.createElement("div");
 
-    this.id = Array.prototype.indexOf.call(this.commentSection.childNodes, this.commentItem); //Find item in Local Storage
-
     this.createComment();
     this.createDropdown();
   }
@@ -138,6 +136,7 @@ class Comment {
   }
 
   editComment() {
+    this.id = Array.prototype.indexOf.call(this.commentSection.childNodes, this.commentItem); //Find item in Local Storage
     this.userInput = document.createElement("input");
     this.commentInput = document.createElement("textarea");
     this.buttonInputs = document.createElement("div");
@@ -177,12 +176,13 @@ class Comment {
 
   saveCommentEdit() {
     //if changes have been made
-    if (this.userInput.value != this.userNameLabel.textContent || this.commentInput.value != this.newComment.textContent) {
-      existingComments[this.id].userName = this.userInput.value;
-      existingComments[this.id].postDate = todaysDate;
-      existingComments[this.id].comment = this.commentInput.value;
-
-      setLocalStorage();
+    if (this.userInput.value != this.userName || this.commentInput.value != this.comment) {
+      this.deleteComment();
+      this.userName = this.userInput.value
+      this.comment = this.commentInput.value
+      this.commentDate = todaysDate;
+      this.saveComment();
+      document.querySelector("#mainSeperator").scrollIntoView();
     }
     this.exitEdit();
   }
@@ -192,13 +192,9 @@ class Comment {
     this.commentInput.remove();
     this.buttonInputs.remove();
 
-    console.log(this.commentItem);
-    console.log(this.id);
-    console.log(existingComments);
-
-    this.userNameLabel.textContent = existingComments[this.id].userName;
-    this.newComment.textContent = existingComments[this.id].comment;
-    this.postDate.textContent = existingComments[this.id].postDate;
+    this.userNameLabel.textContent = this.userName;
+    this.newComment.textContent = this.comment;
+    this.postDate.textContent = this.commentDate;
 
     this.createComment()
     this.createDropdown()
@@ -206,15 +202,18 @@ class Comment {
   }
 
   deleteComment() {
-    existingComments.splice(this.id, 1);
-    this.commentSeperator.remove();
-    this.commentItem.remove();
-
-    setLocalStorage();
+    console.log(existingComments);
+    console.log(this.commentData);
+    // existingComments.splice(this.id, 1);
+    // this.commentSeperator.remove();
+    // this.commentItem.remove();
+    //
+    // setLocalStorage();
   }
 }
 
-let existingComments = JSON.parse(localStorage.commentsArray);
+let existingComments = []
+if (localStorage.commentsArray) existingComments = JSON.parse(localStorage.commentsArray);
 
 const body = document.querySelector("body");
 const userInput = document.querySelector("#userInput");
