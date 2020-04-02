@@ -44,7 +44,7 @@ class Comment {
     this.postDate.setAttribute("class", "commentDate")
     this.newComment.setAttribute("class", "newComment");
 
-    this.userPostDate.append(this.userNameLabel)
+    this.userPostDate.append(this.userNameLabel);
     this.userPostDate.append(this.postDate);
     this.userProfile.appendChild(this.userImage);
     this.userProfile.appendChild(this.userPostDate);
@@ -132,11 +132,11 @@ class Comment {
     this.commentData = {userName: this.userName, postDate: this.commentDate, comment: this.comment};
     existingComments.unshift(this.commentData);
 
+    commentSectionID();
     setLocalStorage();
   }
 
   editComment() {
-    this.id = Array.prototype.indexOf.call(this.commentSection.childNodes, this.commentItem); //Find item in Local Storage
     this.userInput = document.createElement("input");
     this.commentInput = document.createElement("textarea");
     this.buttonInputs = document.createElement("div");
@@ -182,6 +182,7 @@ class Comment {
       this.comment = this.commentInput.value
       this.commentDate = todaysDate;
       this.saveComment();
+
       document.querySelector("#mainSeperator").scrollIntoView();
     }
     this.exitEdit();
@@ -202,17 +203,17 @@ class Comment {
   }
 
   deleteComment() {
-    console.log(existingComments);
-    console.log(this.commentData);
-    // existingComments.splice(this.id, 1);
-    // this.commentSeperator.remove();
-    // this.commentItem.remove();
-    //
-    // setLocalStorage();
+    this.id = this.commentItem.id.replace(/\D/g, "");
+
+    existingComments.splice(this.id, 1);
+    this.commentSeperator.remove();
+    this.commentItem.remove();
+
+    setLocalStorage();
   }
 }
 
-let existingComments = []
+let existingComments = [];
 if (localStorage.commentsArray) existingComments = JSON.parse(localStorage.commentsArray);
 
 const body = document.querySelector("body");
@@ -233,13 +234,12 @@ window.onload = function() {
   userInput.value = "";
   commentInput.value = "";
 
-  if (existingComments) {
-    /*Comment Section is newest to oldest (reversed)*/
-    let i = existingComments.length -1;
-    for (; i >= 0; i--) {
-      new Comment(existingComments[i].userName, existingComments[i].comment, existingComments[i].postDate);
-    }
+  /*Comment Section is newest to oldest (reversed)*/
+  let i = existingComments.length -1;
+  for (; i >= 0; i--) {
+    new Comment(existingComments[i].userName, existingComments[i].comment, existingComments[i].postDate);
 
+  commentSectionID();
   }
 }
 
@@ -275,6 +275,19 @@ function buttonEnableDisable() {
   }
   else {
     submitButton.classList.add("disabled");
+  }
+}
+
+//Seriealize comment Section
+function commentSectionID() {
+  let commentSection = document.querySelector("#commentSection");
+
+  let id = 0;
+  for (i = 0; i < commentSection.children.length; i++) {
+    let commentItem = commentSection.children[i];
+    if (commentItem.classList.contains("commentItem")){
+      commentItem.setAttribute("id", `item${id++}`);
+    }
   }
 }
 
